@@ -6,40 +6,41 @@ public class Login {
     public static void main(String[] args) {
 
         JFrame frame = new JFrame("Password Manager");
-
-        // Main Panel with padding (border spacing)
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(6, 1, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 40)); // top, left, bottom, right
+        frame.setSize(1400, 800); // Desktop size
+        frame.setLayout(null);    // IMPORTANT: enables setBounds
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Title
-        JLabel title = new JLabel("Login", JLabel.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 20));
+        JLabel title = new JLabel("Login");
+        title.setBounds(650, 100, 200, 40);
+        title.setFont(new Font("Arial", Font.BOLD, 24));
 
         // Username
         JLabel userLabel = new JLabel("Username:");
+        userLabel.setBounds(550, 200, 100, 30);
+
         JTextField userField = new JTextField();
+        userField.setBounds(650, 200, 200, 30);
 
         // Master Password
         JLabel passLabel = new JLabel("Master Password:");
-        JPasswordField passField = new JPasswordField();
+        passLabel.setBounds(520, 260, 130, 30);
 
-        // Button
+        JPasswordField passField = new JPasswordField();
+        passField.setBounds(650, 260, 200, 30);
+
+        // Login Button
         JButton loginBtn = new JButton("Login");
+        loginBtn.setBounds(650, 320, 100, 35);
 
         // Add components
-        panel.add(title);
-        panel.add(userLabel);
-        panel.add(userField);
-        panel.add(passLabel);
-        panel.add(passField);
-        panel.add(loginBtn);
+        frame.add(title);
+        frame.add(userLabel);
+        frame.add(userField);
+        frame.add(passLabel);
+        frame.add(passField);
+        frame.add(loginBtn);
 
-        // Frame settings
-        frame.add(panel);
-        frame.setSize(400, 300);
-        frame.setLocationRelativeTo(null); // center screen
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
 }
