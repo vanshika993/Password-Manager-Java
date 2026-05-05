@@ -1,46 +1,77 @@
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class Login {
-    
     public static void main(String[] args) {
 
         JFrame frame = new JFrame("Password Manager");
-        frame.setSize(1400, 800); // Desktop size
-        frame.setLayout(null);    // IMPORTANT: enables setBounds
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setLayout(new GridBagLayout());
+        frame.getContentPane().setBackground(new Color(240, 242, 245));
+
+        // Main card panel
+        JPanel card = new JPanel(new GridBagLayout());
+        card.setBackground(Color.WHITE);
+        card.setPreferredSize(new Dimension(900, 650));
+        card.setBorder(new EmptyBorder(80, 100, 80, 100));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1;
 
         // Title
         JLabel title = new JLabel("Login");
-        title.setBounds(650, 100, 200, 40);
-        title.setFont(new Font("Arial", Font.BOLD, 24));
+        title.setFont(new Font("Segoe UI", Font.BOLD, 54));
+        gbc.gridy = 0;
+        gbc.insets = new Insets(0, 0, 60, 0);
+        card.add(title, gbc);
 
-        // Username
-        JLabel userLabel = new JLabel("Username:");
-        userLabel.setBounds(550, 200, 100, 30);
+        // Username label
+        JLabel userLabel = new JLabel("Username");
+        userLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        gbc.gridy = 1;
+        gbc.insets = new Insets(0, 0, 10, 0);
+        card.add(userLabel, gbc);
 
+        // Username field
         JTextField userField = new JTextField();
-        userField.setBounds(650, 200, 200, 30);
+        userField.setFont(new Font("Segoe UI", Font.PLAIN, 24));
+        userField.setPreferredSize(new Dimension(0, 60));
+        gbc.gridy = 2;
+        gbc.insets = new Insets(0, 0, 30, 0);
+        card.add(userField, gbc);
 
-        // Master Password
-        JLabel passLabel = new JLabel("Master Password:");
-        passLabel.setBounds(520, 260, 130, 30);
+        // Password label
+        JLabel passLabel = new JLabel("Master Password");
+        passLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        gbc.gridy = 3;
+        gbc.insets = new Insets(0, 0, 10, 0);
+        card.add(passLabel, gbc);
 
+        // Password field
         JPasswordField passField = new JPasswordField();
-        passField.setBounds(650, 260, 200, 30);
+        passField.setFont(new Font("Segoe UI", Font.PLAIN, 24));
+        passField.setPreferredSize(new Dimension(0, 60));
+        gbc.gridy = 4;
+        gbc.insets = new Insets(0, 0, 40, 0);
+        card.add(passField, gbc);
 
-        // Login Button
-        JButton loginBtn = new JButton("Login");
-        loginBtn.setBounds(650, 320, 100, 35);
+        // Button (smaller width)
+        JButton loginBtn = new JButton("Access Vault");
+        loginBtn.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        loginBtn.setBackground(new Color(0, 102, 204));
+        loginBtn.setForeground(Color.WHITE);
 
-        // Add components
-        frame.add(title);
-        frame.add(userLabel);
-        frame.add(userField);
-        frame.add(passLabel);
-        frame.add(passField);
-        frame.add(loginBtn);
+        gbc.gridy = 5;
+        gbc.fill = GridBagConstraints.NONE; // important: stops full width
+        gbc.anchor = GridBagConstraints.CENTER;
+        loginBtn.setPreferredSize(new Dimension(250, 60)); // smaller width
+        card.add(loginBtn, gbc);
 
+        frame.add(card);
         frame.setVisible(true);
     }
 }
