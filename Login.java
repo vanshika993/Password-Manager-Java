@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Login {
-
+    
     public static void main(String[] args) {
 
         JFrame frame = new JFrame("Password Manager");
