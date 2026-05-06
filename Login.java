@@ -2,7 +2,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
-public class Login {
+public class LogIn {
     public static void main(String[] args) {
 
         JFrame frame = new JFrame("Password Manager");
@@ -13,7 +13,7 @@ public class Login {
 
         // Main card panel
         JPanel card = new JPanel(new GridBagLayout());
-        card.setBackground(new Color(204, 255, 255));
+        card.setBackground(new Color(197, 193, 252));
         card.setPreferredSize(new Dimension(900, 650));
         card.setBorder(new EmptyBorder(80, 100, 80, 100));
 
@@ -23,7 +23,7 @@ public class Login {
         gbc.weightx = 1;
 
         // Title
-        JLabel title = new JLabel("Login");
+        JLabel title = new JLabel("Login", SwingConstants.CENTER);
         title.setFont(new Font("Segoe UI", Font.BOLD, 54));
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 60, 0);
@@ -60,15 +60,16 @@ public class Login {
         card.add(passField, gbc);
 
         // Button (smaller width)
-        JButton loginBtn = new JButton("Access Vault");
+        JButton loginBtn = new JButton("Login");
         loginBtn.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        loginBtn.setBackground(new Color(0, 102, 204));
+        loginBtn.setBackground(new Color(0, 0, 180));
         loginBtn.setForeground(Color.WHITE);
 
         gbc.gridy = 5;
+        gbc.insets = new Insets(45, 0, 0, 0);
         gbc.fill = GridBagConstraints.NONE; // important: stops full width
         gbc.anchor = GridBagConstraints.CENTER;
-        loginBtn.setPreferredSize(new Dimension(250, 60)); // smaller width
+        loginBtn.setPreferredSize(new Dimension(400, 80)); // smaller width
         card.add(loginBtn, gbc);
 
         frame.add(card);
