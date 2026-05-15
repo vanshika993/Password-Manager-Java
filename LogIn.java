@@ -76,49 +76,20 @@ public class LogIn
 
         
         loginBtn.addActionListener(e -> {
-    String username = userField.getText();
-    String password = new String(passField.getPassword());
+       String username = userField.getText();
+       String password = new String(passField.getPassword());
 
      
-    if (ExcelHelper.validateUser(username, password)) {
+      if (ExcelHelper.validateUser(username, password)) {
         JOptionPane.showMessageDialog(frame, "Login Successful!");
         frame.dispose();  
         MainPage.main(null); 
-    } else {
+        } else {
         JOptionPane.showMessageDialog(frame, "Invalid Credentials");
-    }
-});
+        }
+      });
 
         frame.add(card);
         frame.setVisible(true);
-    }
-
-     
-    public static boolean checkLogin(String user, String pass) {
-        try {
-            FileInputStream file = new FileInputStream("users.xlsx");
-            Workbook wb = WorkbookFactory.create(file);
-            Sheet sheet = wb.getSheetAt(0);
-
-            for (Row row : sheet) {
-                Cell userCell = row.getCell(0);
-                Cell passCell = row.getCell(1);
-
-                if (userCell != null && passCell != null) {
-                    String dbUser = userCell.getStringCellValue();
-                    String dbPass = passCell.getStringCellValue();
-
-                    if (user.equals(dbUser) && pass.equals(dbPass)) {
-                        wb.close();
-                        return true;
-                    }
-                }
-            }
-
-            wb.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
     }
 }
