@@ -8,11 +8,11 @@ import java.util.ArrayList;
 public class ExcelHelper {
     private static final String FILE_NAME = "users.xlsx";
 
-    // This checks the database for a matching username and password
+    
     public static boolean validateUser(String inputUser, String inputPass) {
         File file = new File(FILE_NAME);
 
-        // If the database doesn't exist yet, create it with a default user
+         
         if (!file.exists()) {
             createDefaultDatabase();
         }
@@ -29,7 +29,7 @@ public class ExcelHelper {
                     String dbUser = userCell.getStringCellValue();
                     String dbPass = passCell.getStringCellValue();
 
-                    // If both match, verification passes!
+                     
                     if (inputUser.equals(dbUser) && inputPass.equals(dbPass)) {
                         return true;
                     }
@@ -41,13 +41,13 @@ public class ExcelHelper {
         return false;
     }
 
-    // Helper to initialize the Excel sheet if it's completely missing
+     
     private static void createDefaultDatabase() {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Credentials");
             Row defaultRow = sheet.createRow(0);
             
-            // Setting a default credential so you can log in right away
+             
             defaultRow.createCell(0).setCellValue("Vanshika");
             defaultRow.createCell(1).setCellValue("12345");
 
@@ -61,7 +61,7 @@ public class ExcelHelper {
     }
     private static final String PASS_SHEET_NAME = "Passwords";
 
-// 1. SAVE A NEW PASSWORD RECORD TO EXCEL
+ 
 public static boolean savePasswordRecord(String website, String username, String encryptedPass) {
     File file = new File(FILE_NAME);
     Workbook workbook;
@@ -76,18 +76,18 @@ public static boolean savePasswordRecord(String website, String username, String
             workbook = new XSSFWorkbook();
         }
 
-        // Get or dynamically create the password sheet tab
+         
         sheet = workbook.getSheet(PASS_SHEET_NAME);
         if (sheet == null) {
             sheet = workbook.createSheet(PASS_SHEET_NAME);
-            // Create a quick title header row index 0
+        
             Row headerRow = sheet.createRow(0);
             headerRow.createCell(0).setCellValue("Website");
             headerRow.createCell(1).setCellValue("Username");
             headerRow.createCell(2).setCellValue("Password");
         }
 
-        // Append to the bottom of the spreadsheet layout
+        
         int lastRowIndex = sheet.getLastRowNum();
         Row newRow = sheet.createRow(lastRowIndex + 1);
         
@@ -106,7 +106,7 @@ public static boolean savePasswordRecord(String website, String username, String
     }
 }
 
-// 2. READ ALL PASSWORDS FROM EXCEL INTO JAVA MEMORY
+ 
 public static ArrayList<Credential> loadAllPasswords() {
     ArrayList<Credential> records = new ArrayList<>();
     File file = new File(FILE_NAME);
@@ -118,7 +118,7 @@ public static ArrayList<Credential> loadAllPasswords() {
         Sheet sheet = workbook.getSheet(PASS_SHEET_NAME);
         if (sheet == null) return records;
 
-        // Loop rows skipping the header line
+         
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
             if (row == null) continue;
@@ -141,7 +141,7 @@ public static ArrayList<Credential> loadAllPasswords() {
     return records;
 }
 
-// 3. DELETE A TARGET RECORD FROM THE SPREADSHEET SYSTEM
+ 
 public static boolean deletePasswordRecord(String website, String username) {
     File file = new File(FILE_NAME);
     if (!file.exists()) return false;
@@ -162,7 +162,7 @@ public static boolean deletePasswordRecord(String website, String username) {
 
             if (dbWeb.equals(website) && dbUser.equals(username)) {
                 int lastRowNo = sheet.getLastRowNum();
-                // Shift rows up to cleanly wipe out the missing index gap
+                 
                 if (i < lastRowNo) {
                     sheet.shiftRows(i + 1, lastRowNo, -1);
                 } else {
