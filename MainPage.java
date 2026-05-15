@@ -6,6 +6,7 @@ public class MainPage
     public static void main(String[] args) {
         JFrame frame = new JFrame("Password Manager");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setSize(800, 600);
         frame.setLayout(new BorderLayout());
         JPanel sidebar = new JPanel();
