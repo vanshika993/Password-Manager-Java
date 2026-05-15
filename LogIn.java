@@ -76,17 +76,18 @@ public class LogIn
 
         
         loginBtn.addActionListener(e -> {
-            String username = userField.getText();
-            String password = new String(passField.getPassword());
+    String username = userField.getText();
+    String password = new String(passField.getPassword());
 
-            if(checkLogin(username, password)) {
-                JOptionPane.showMessageDialog(frame, "Login Successful!");
-                frame.dispose();
-                MainPage.main(null);
-            } else {
-                JOptionPane.showMessageDialog(frame, "Invalid Credentials");
-            }
-        });
+    // We call our helper file to do the database heavy lifting
+    if (ExcelHelper.validateUser(username, password)) {
+        JOptionPane.showMessageDialog(frame, "Login Successful!");
+        frame.dispose(); // Close login window
+        MainPage.main(null); // Open main page window
+    } else {
+        JOptionPane.showMessageDialog(frame, "Invalid Credentials");
+    }
+});
 
         frame.add(card);
         frame.setVisible(true);
