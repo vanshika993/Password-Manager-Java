@@ -1,11 +1,18 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Dimension;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.awt.event.ActionListener;
+import java.io.FileInputStream;
+import org.apache.poi.ss.usermodel.*;
 
-public class LogIn 
+public class LogIn
 {
-    public static void main(String[] args) 
+    public static void main(String[] args)
     {
         JFrame frame = new JFrame("Password Manager");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -23,14 +30,12 @@ public class LogIn
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1;
 
-        // Title
         JLabel title = new JLabel("Login", SwingConstants.CENTER);
         title.setFont(new Font("Segoe UI", Font.BOLD, 54));
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 60, 0);
         card.add(title, gbc);
 
-        // Username
         JLabel userLabel = new JLabel("Username");
         userLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
         gbc.gridy = 1;
@@ -44,7 +49,6 @@ public class LogIn
         gbc.insets = new Insets(0, 0, 30, 0);
         card.add(userField, gbc);
 
-        // Password
         JLabel passLabel = new JLabel("Master Password");
         passLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
         gbc.gridy = 3;
@@ -58,7 +62,6 @@ public class LogIn
         gbc.insets = new Insets(0, 0, 40, 0);
         card.add(passField, gbc);
 
-        // Button
         JButton loginBtn = new JButton("Login");
         loginBtn.setFont(new Font("Segoe UI", Font.BOLD, 20));
         loginBtn.setBackground(new Color(0, 0, 180));
@@ -71,24 +74,20 @@ public class LogIn
         loginBtn.setPreferredSize(new Dimension(400, 80));
         card.add(loginBtn, gbc);
 
-        // 🔥 EVENT HANDLING (Dynamic Part)
-        loginBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        
+        loginBtn.addActionListener(e -> {
+       String username = userField.getText();
+       String password = new String(passField.getPassword());
 
-                String username = userField.getText();
-                String password = new String(passField.getPassword());
-
-                if(username.equals("admin") && password.equals("1234")) {
-                    JOptionPane.showMessageDialog(frame, "Login Successful!");
-
-                    frame.dispose(); // close login
-                    MainPage.main(null); // open main page
-                } 
-                else {
-                    JOptionPane.showMessageDialog(frame, "Invalid Username or Password");
-                }
-            }
-        });
+     
+      if (ExcelHelper.validateUser(username, password)) {
+        JOptionPane.showMessageDialog(frame, "Login Successful!");
+        frame.dispose();  
+        MainPage.main(null); 
+        } else {
+        JOptionPane.showMessageDialog(frame, "Invalid Credentials");
+        }
+      });
 
         frame.add(card);
         frame.setVisible(true);
