@@ -1,13 +1,19 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 
 public class MainPage 
 {
+    private static JPanel listPanel; // Static reference to easily refresh the UI dashboard list
+
     public static void main(String[] args) {
 
         JFrame frame = new JFrame("Password Manager");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        // Force the main window to open maximized / full-screen natively
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setSize(800, 600);
         frame.setLayout(new BorderLayout());
 
@@ -42,12 +48,15 @@ public class MainPage
         JPanel content = new JPanel(new BorderLayout());
         content.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        // 🔹 LIST PANEL (to store cards)
-        JPanel listPanel = new JPanel();
+        // 🔹 LIST PANEL (to hold visual password rows)
+        listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
         listPanel.setBackground(Color.WHITE);
 
         JScrollPane scrollPane = new JScrollPane(listPanel);
+
+        // 💾 EXCEL INITIAL LOADING: Fetch saved passwords immediately on startup
+        refreshPasswordList();
 
         // Default view (Home)
         content.add(scrollPane, BorderLayout.CENTER);
@@ -56,6 +65,7 @@ public class MainPage
         homeBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 content.removeAll();
+                refreshPasswordList(); // Dynamic refresh from Excel when hitting home
                 content.add(scrollPane, BorderLayout.CENTER);
                 content.revalidate();
                 content.repaint();
@@ -71,38 +81,44 @@ public class MainPage
                 JPanel form = new JPanel(new GridLayout(3, 2, 10, 10));
 
                 JTextField platformField = new JTextField();
-                JTextField userField = new JTextField();
+                // 🔐 JPasswordField secures input text by masking it with dots natively
+                JPasswordField passwordField = new JPasswordField(); 
                 JButton saveBtn = new JButton("Save");
 
                 form.add(new JLabel("Platform:"));
                 form.add(platformField);
-                form.add(new JLabel("Username:"));
-                form.add(userField);
+                form.add(new JLabel("Password:")); 
+                form.add(passwordField);           
                 form.add(new JLabel(""));
                 form.add(saveBtn);
 
                 content.add(form, BorderLayout.NORTH);
 
-                // 🔥 SAVE BUTTON EVENT
+                // 🔥 SAVE BUTTON EVENT (Encrypts & pushes record to users.xlsx)
                 saveBtn.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent ev) {
 
-                        String platform = platformField.getText();
-                        String user = userField.getText();
+                        String platform = platformField.getText().trim();
+                        String rawPassword = new String(passwordField.getPassword()).trim();
 
-                        if (!platform.isEmpty() && !user.isEmpty()) {
+                        if (!platform.isEmpty() && !rawPassword.isEmpty()) {
+                            
+                            // 1. 🔒 Cryptographic Step: Encrypt the password string via AESUtil
+                            String encryptedPass = AESUtil.encrypt(rawPassword);
 
-                            listPanel.add(createCard(platform, user));
-                            listPanel.add(Box.createVerticalStrut(10));
+                            // 2. 💾 Persistence Step: Save records to the designated Excel sheet
+                            // Username field is passed as a blank string "" since we transitioned to Platform & Password
+                            boolean isSaved = ExcelHelper.savePasswordRecord(platform, "", encryptedPass);
 
-                            listPanel.revalidate();
-                            listPanel.repaint();
-
-                            JOptionPane.showMessageDialog(frame, "Saved!");
-
-                            // Clear fields
-                            platformField.setText("");
-                            userField.setText("");
+                            if (isSaved) {
+                                JOptionPane.showMessageDialog(frame, "Saved securely to Excel Database!");
+                                
+                                // Reset fields cleanly
+                                platformField.setText("");
+                                passwordField.setText("");
+                            } else {
+                                JOptionPane.showMessageDialog(frame, "Database Write Error!", "Error", JOptionPane.ERROR_MESSAGE);
+                            }
                         } else {
                             JOptionPane.showMessageDialog(frame, "Fill all fields!");
                         }
@@ -119,23 +135,102 @@ public class MainPage
         frame.setVisible(true);
     }
 
-    // 🔹 CARD UI
-    private static JPanel createCard(String platform, String user) {
+    // 🔹 REFRESH AND SYNC ALL METHOD ENTRIES FROM THE EXCEL ENGINE
+    private static void refreshPasswordList() {
+        listPanel.removeAll(); 
+
+        // Call ExcelHelper method to pull decrypted wrapper elements from spreadsheet
+        ArrayList<Credential> savedPasswords = ExcelHelper.loadAllPasswords();
+
+        for (Credential cred : savedPasswords) {
+            // Build out an individual visual dashboard card for every single asset inside the file
+            listPanel.add(createCard(cred.website, cred.encryptedPassword));
+            listPanel.add(Box.createVerticalStrut(10));
+        }
+
+        listPanel.revalidate();
+        listPanel.repaint();
+    }
+
+    // 🔹 DYNAMIC UI CARD GENERATOR WITH EYE TOGGLE & SPREADSHEET DELETION
+    private static JPanel createCard(String platform, String encryptedPassword) {
         JPanel card = new JPanel(new BorderLayout());
         card.setBackground(Color.WHITE);
         card.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(Color.LIGHT_GRAY),
                 BorderFactory.createEmptyBorder(15, 15, 15, 15)
-        ));
-        card.setMaximumSize(new Dimension(500, 70));
+                ));
+        card.setMaximumSize(new Dimension(600, 70));
 
         JPanel info = new JPanel(new GridLayout(2, 1));
         info.setBackground(Color.WHITE);
-        info.add(new JLabel(platform));
-        info.add(new JLabel(user));
+        
+        JLabel platLabel = new JLabel("Platform: " + platform);
+        platLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        
+        JLabel passLabel = new JLabel("Password: ••••••••"); 
+        passLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+
+        info.add(platLabel);
+        info.add(passLabel);
+
+        // UI alignment container for right-aligned interactions
+        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        actionPanel.setBackground(Color.WHITE);
+
+        // 👁️ EYE DECRYPTION TOGGLE BUTTON
+        JButton eyeBtn = new JButton("👁️");
+        eyeBtn.setFocusPainted(false);
+        eyeBtn.setContentAreaFilled(false);
+        eyeBtn.setBorderPainted(false);
+        
+        eyeBtn.addActionListener(new ActionListener() {
+            private boolean isRevealed = false;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!isRevealed) {
+                    // Decrypt string data tracking dynamically using AESUtil
+                    String decrypted = AESUtil.decrypt(encryptedPassword);
+                    passLabel.setText("Password: " + decrypted);
+                    isRevealed = true;
+                } else {
+                    passLabel.setText("Password: ••••••••");
+                    isRevealed = false;
+                }
+            }
+        });
+
+        // ❌ RECORD DELETION BUTTON
+        JButton deleteBtn = new JButton("❌");
+        deleteBtn.setFocusPainted(false);
+        deleteBtn.setContentAreaFilled(false);
+        deleteBtn.setBorderPainted(false);
+        
+        deleteBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int confirm = JOptionPane.showConfirmDialog(card, 
+                        "Are you sure you want to delete the password for " + platform + "?", 
+                        "Delete Record", JOptionPane.YES_NO_OPTION);
+                        
+                if (confirm == JOptionPane.YES_OPTION) {
+                    // Database Layer: Wipe targeted row matching the matching platform name string
+                    boolean isDeleted = ExcelHelper.deletePasswordRecord(platform, "");
+                    if (isDeleted) {
+                        refreshPasswordList(); // Dynamic clean interface reload context
+                    } else {
+                        JOptionPane.showMessageDialog(card, "Error removing record from Excel database file.");
+                    }
+                }
+            }
+        });
+
+        actionPanel.add(eyeBtn);
+        actionPanel.add(deleteBtn);
 
         card.add(info, BorderLayout.WEST);
-        card.add(new JLabel("••••••"), BorderLayout.EAST);
+        card.add(actionPanel, BorderLayout.EAST);
 
         return card;
     }
